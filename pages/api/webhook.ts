@@ -5,7 +5,7 @@ const bot = new Bot(process.env["TELEGRAM_TOKEN"] as string)
 
 
 bot.command("start", (c) => {
-    c.reply("hello🤖,\ni am a telegram bot\nmade by t.me/iwanSlebew to convert tiktok links to video/photos\n\njust paste link!")
+    c.reply("hello🤖,\ni am a telegram bot\nmade by t.me/iwanSlebew to convert tiktok links to video/photos.\n")
 })
 
 bot.on("message", async (c) => {
