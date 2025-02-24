@@ -16,13 +16,26 @@ bot.on("message", async (c) => {
 
     const message = await c.reply("wait🕛...")
 
-    const res = await fetch(`https://tiktok-download-without-watermark.p.rapidapi.com/analysis?url${c.message.text}&hd=0`, {
+    //const res = await fetch(`https://tiktok-download-without-watermark.p.rapidapi.com/analysis?url${c.message.text}&hd=0`, {
+    //  headers: {
+    //     'x-rapidapi-key': process.env["RAPIDAPI_KEY"] as string,
+    //   'x-rapidapi-host': 'tiktok-download-without-watermark.p.rapidapi.com'
+    //},
+    //})
+
+    const res = await fetch('https://api.ssstik.io/v1/tiktok', {
+        method: "POST",
         headers: {
-            'x-rapidapi-key': process.env["RAPIDAPI_KEY"] as string,
-            'x-rapidapi-host': 'tiktok-download-without-watermark.p.rapidapi.com'
+            'Content-Type': 'application/json'
         },
+        body: JSON.stringify({
+            url: c.message.text
+        })
     })
+
     const data = await res.json()
+
+    console.log(data)
 
     if (!data.data) {
         return c.reply("Oops something wrong, please try tomorow🙏")
