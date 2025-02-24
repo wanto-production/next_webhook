@@ -35,7 +35,7 @@ bot.on("message", async (c) => {
 
     const data = await res.json()
 
-    console.log(data)
+    return c.reply(JSON.stringify(data))
 
     if (!data.data) {
         return c.reply("Oops something wrong, please try tomorow🙏")
