@@ -1,8 +1,5 @@
 import { Bot, webhookCallback, InputMediaBuilder } from "grammy";
-import { GoogleGenerativeAI } from "@google/generative-ai";
 
-const genAI = new GoogleGenerativeAI(process.env["GEMINI_APIKEY"] as string)
-const model = genAI.getGenerativeModel({ model: "gemini-2.0-flash" });
 const bot = new Bot(process.env["TELEGRAM_TOKEN"] as string)
 
 bot.api.setMyCommands([
@@ -15,21 +12,7 @@ bot.command("start", (c) => {
     c.reply("hello🤖,\ni am a telegram bot\nmade by t.me/iwanSlebew to convert tiktok links to video/photos.\n")
 })
 
-bot.command("gemini", async (c) => {
-    const body = c.message?.text?.split(' ').slice(1).join(' ')
 
-    if (!body) return c.reply("Oops message cannot empty!")
-
-    await c.react("👍")
-
-    try {
-        const { response } = await model.generateContent(body)
-
-        c.reply(JSON.stringify(response))
-    } catch (err) {
-        c.reply(`error: ${(err as Error).message}`)
-    }
-})
 
 bot.on("message", async (c) => {
     if (
