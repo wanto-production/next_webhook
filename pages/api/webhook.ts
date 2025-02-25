@@ -18,7 +18,11 @@ bot.command("start", (c) => {
 bot.command("gemini", async (c) => {
     const body = c.message?.text?.split(' ').slice(1).join(' ')
 
-    c.reply(body!)
+    if (!body) return await c.reply("Oops message cannot empty!")
+
+    const { response } = await model.generateContent(body)
+
+    c.reply(response.text())
 })
 
 bot.on("message", async (c) => {
