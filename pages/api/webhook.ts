@@ -3,8 +3,7 @@ import { Bot, webhookCallback, InputMediaBuilder } from "grammy";
 const bot = new Bot(process.env["TELEGRAM_TOKEN"] as string)
 
 bot.api.setMyCommands([
-    { command: "start", description: "bot description" },
-    { command: "gemini", description: "for ask gemini ai" }
+    { command: "start", description: "bot description" }
 ])
 
 
