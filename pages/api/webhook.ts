@@ -16,7 +16,7 @@ bot.command("start", (c) => {
 })
 
 bot.command("gemini", async (c) => {
-    const body = c.message?.text
+    const body = c.message?.text?.split(' ').slice(1).join(' ')
 
     c.reply(body!)
 })
