@@ -28,17 +28,15 @@ bot.on("message", async (c) => {
         },
     })
 
-
-
     const data = await res.json()
 
     if (!data.msg) {
         return c.reply(`Oops ${data.msg}`)
-            .then(async () => await c.api.deleteMessage(c.chatId as number, message.message_id));
+            .then(() => c.api.deleteMessage(c.chatId as number, message.message_id));
     }
 
     if (data.data.images) {
-        return await c.replyWithMediaGroup(data.data.images.map((image: string) => {
+        return c.replyWithMediaGroup(data.data.images.map((image: string) => {
             return InputMediaBuilder.photo(image)
         })).then(async () => {
             await c.reply("completed! ✅, type:photo")
@@ -47,9 +45,9 @@ bot.on("message", async (c) => {
     }
 
     if ((data.data.play as string).includes(".mp4")) {
-        return await c.api.sendVideo(c.chatId as number, data.data.play, {
+        return c.api.sendVideo(c.chatId as number, data.data.play, {
             caption: "completed! ✅, type:video"
-        }).then(async () => await c.api.deleteMessage(c.chatId as number, message.message_id))
+        }).then(() => c.api.deleteMessage(c.chatId as number, message.message_id))
     }
 
 })
