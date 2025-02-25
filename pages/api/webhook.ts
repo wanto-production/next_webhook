@@ -29,22 +29,22 @@ bot.on("message", async (c) => {
 
     if (!data.msg) {
         return c.reply(`Oops ${data.msg}`)
-            .then(() => c.api.deleteMessage(c.chatId as number, message.message_id));
+            .then(async () => await c.api.deleteMessage(c.chatId as number, message.message_id));
     }
 
     if (data.data.images) {
         return await c.replyWithMediaGroup(data.data.images.map((image: string) => {
             return InputMediaBuilder.photo(image)
-        })).then(() => {
-            c.reply("completed! ✅, type:photo")
-            c.api.deleteMessage(c.chatId as number, message.message_id)
+        })).then(async () => {
+            await c.reply("completed! ✅, type:photo")
+            await c.api.deleteMessage(c.chatId as number, message.message_id)
         })
     }
 
     if ((data.data.play as string).includes(".mp4")) {
         return await c.api.sendVideo(c.chatId as number, data.data.play, {
             caption: "completed! ✅, type:video"
-        }).then(() => c.api.deleteMessage(c.chatId as number, message.message_id))
+        }).then(async () => await c.api.deleteMessage(c.chatId as number, message.message_id))
     }
 
 })
