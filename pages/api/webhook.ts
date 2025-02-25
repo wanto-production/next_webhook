@@ -16,7 +16,7 @@ bot.on("message", async (c) => {
 
     const message = await c.reply("wait🕛...")
 
-    const res = await fetch(`https://tiktok-download-without-watermark.p.rapidapi.com/analysis?url${c.message.text}&hd=0`, {
+    const res = await fetch(`https://tiktok-download-without-watermark.p.rapidapi.com/analysis?url=${c.message.text}&hd=0`, {
         headers: {
             'x-rapidapi-key': process.env["RAPIDAPI_KEY"] as string,
             'x-rapidapi-host': 'tiktok-download-without-watermark.p.rapidapi.com'
@@ -27,9 +27,8 @@ bot.on("message", async (c) => {
 
     const data = await res.json()
 
-    await c.reply(JSON.stringify(data))
-    if (!data.data) {
-        return c.reply("Oops something wrong, please try tomorow🙏")
+    if (!data.msg) {
+        return c.reply(`Oops ${data.msg}`)
             .then(() => c.api.deleteMessage(c.chatId as number, message.message_id));
     }
 
