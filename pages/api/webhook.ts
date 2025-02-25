@@ -27,7 +27,7 @@ bot.on("message", async (c) => {
 
     const data = await res.json()
 
-
+    await c.reply(JSON.stringify(data))
     if (!data.data) {
         return c.reply("Oops something wrong, please try tomorow🙏")
             .then(() => c.api.deleteMessage(c.chatId as number, message.message_id));
