@@ -20,12 +20,10 @@ bot.command("gemini", async (c) => {
 
     if (!body) return c.reply("Oops message cannot empty!")
 
-    const message = await c.reply("waiting for response...")
+    await c.react("👍")
 
     try {
         const { response } = await model.generateContent(body)
-
-        await c.api.deleteMessage(c.chatId, message.message_id)
 
         c.reply(JSON.stringify(response))
     } catch (err) {
