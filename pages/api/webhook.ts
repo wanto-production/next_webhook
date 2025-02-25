@@ -3,6 +3,10 @@ import { Bot, InputMediaBuilder, webhookCallback } from "grammy";
 
 const bot = new Bot(process.env["TELEGRAM_TOKEN"] as string)
 
+bot.api.setMyCommands([
+    { command: "start", description: "bot description" },
+    { command: "gemini", description: "for ask gemini ai" }
+])
 
 bot.command("start", (c) => {
     c.reply("hello🤖,\ni am a telegram bot\nmade by t.me/iwanSlebew to convert tiktok links to video/photos.\n")
