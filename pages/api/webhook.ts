@@ -6,12 +6,9 @@ bot.api.setMyCommands([
     { command: "start", description: "bot description" }
 ])
 
-
 bot.command("start", (c) => {
     c.reply("hello🤖,\ni am a telegram bot\nmade by t.me/iwanSlebew to convert tiktok links to video/photos.\n")
 })
-
-
 
 bot.on("message", async (c) => {
     if (
@@ -55,6 +52,5 @@ bot.on("message", async (c) => {
 bot.catch((error) => {
     console.log(error.message)
 })
-
 
 export default webhookCallback(bot, 'next-js')
