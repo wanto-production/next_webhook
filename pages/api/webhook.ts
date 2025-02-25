@@ -12,15 +12,15 @@ bot.api.setMyCommands([
 
 
 bot.command("start", (c) => {
-    c.reply("hello🤖,\ni am a telegram bot\nmade by t.me/iwanSlebew to convert tiktok links to video/photos.\n")
+    return c.reply("hello🤖,\ni am a telegram bot\nmade by t.me/iwanSlebew to convert tiktok links to video/photos.\n")
 })
 
 bot.command("gemini", async (c) => {
     const body = c.message?.text?.split(' ').slice(1).join(' ')
 
-    if (!body) return await c.reply("Oops message cannot empty!")
+    if (!body) return c.reply("Oops message cannot empty!")
 
-    const message = await c.reply("wait🕛...")
+    const message = await c.reply("waiting for response...")
 
     const { response } = await model.generateContent(body)
 
