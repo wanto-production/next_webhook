@@ -1,78 +1,99 @@
-import { Bot, webhookCallback, InputMediaBuilder } from "grammy";
+import { Bot, webhookCallback, InputMediaPhoto } from "grammy";
 import { GoogleGenerativeAI } from "@google/generative-ai";
 
-const genAI = new GoogleGenerativeAI(process.env["GEMINI_APIKEY"] as string)
+const TELEGRAM_TOKEN = process.env["TELEGRAM_TOKEN"];
+const GEMINI_APIKEY = process.env["GEMINI_APIKEY"];
+const RAPIDAPI_KEY = process.env["RAPIDAPI_KEY"];
+
+if (!TELEGRAM_TOKEN || !GEMINI_APIKEY || !RAPIDAPI_KEY) {
+    throw new Error("❌ Missing environment variables! Please set TELEGRAM_TOKEN, GEMINI_APIKEY, and RAPIDAPI_KEY.");
+}
+
+const genAI = new GoogleGenerativeAI(GEMINI_APIKEY);
 const model = genAI.getGenerativeModel({ model: "gemini-2.0-flash" });
-const bot = new Bot(process.env["TELEGRAM_TOKEN"] as string)
+const bot = new Bot(TELEGRAM_TOKEN);
 
 bot.api.setMyCommands([
-    { command: "start", description: "bot description" },
-    { command: "gemini", description: "for ask gemini ai" }
-])
+    { command: "start", description: "Bot description" },
+    { command: "gemini", description: "Ask Gemini AI" }
+]);
 
-
+// 📌 START COMMAND
 bot.command("start", (c) => {
-    return c.reply("hello🤖,\ni am a telegram bot\nmade by t.me/iwanSlebew to convert tiktok links to video/photos.\n")
-})
+    return c.reply("🤖 Hello,\nI am a Telegram bot\nMade by @iwanSlebew to convert TikTok links to video/photos.");
+});
 
+// 📌 GEMINI COMMAND
 bot.command("gemini", async (c) => {
-    const body = c.message?.text?.split(' ').slice(1).join(' ')
+    const body = c.message?.text?.split(" ").slice(1).join(" ");
+    if (!body) return c.reply("❌ Message cannot be empty!");
 
-    if (!body) return c.reply("Oops message cannot empty!")
+    const message = await c.reply("⏳ Waiting for response...");
 
-    const message = await c.reply("waiting for response...")
+    try {
+        const { response } = await model.generateContent(body);
+        const answer = response.candidates[0]?.content?.parts[0]?.text || "I don't know the answer. 😕";
 
-    const { response } = await model.generateContent(body)
+        await c.api.deleteMessage(c.chat.id, message.message_id);
+        return c.reply(answer);
+    } catch (error) {
+        console.error(error);
+        return c.reply("❌ Error while processing Gemini AI.");
+    }
+});
 
-    await c.api.deleteMessage(c.chatId, message.message_id)
-
-    return c.reply(response.text())
-})
-
+// 📌 HANDLE TIKTOK LINKS
 bot.on("message", async (c) => {
-    if (
-        c.message.text &&
-        !RegExp('https?:\/\/(vt|vn|vm)\.tiktok\.com\/[a-zA-Z0-9]+').test(c.message.text)
-    ) return c.reply("Oops wrong format!");
+    if (!c.message.text) return;
 
-    const message = await c.reply("wait🕛...")
+    const tiktokRegex = /https?:\/\/(www\.)?(vt|vn|vm|tiktok)\.com\/.*/;
+    if (!tiktokRegex.test(c.message.text)) return c.reply("❌ Invalid TikTok link!");
 
-    const res = await fetch(`https://tiktok-download-without-watermark.p.rapidapi.com/analysis?url=${c.message.text}&hd=0`, {
-        headers: {
-            'x-rapidapi-key': process.env["RAPIDAPI_KEY"] as string,
-            'x-rapidapi-host': 'tiktok-download-without-watermark.p.rapidapi.com'
-        },
-    })
+    const message = await c.reply("⏳ Processing your TikTok link...");
 
+    try {
+        const res = await fetch(`https://tiktok-download-without-watermark.p.rapidapi.com/analysis?url=${c.message.text}&hd=0`, {
+            headers: {
+                "x-rapidapi-key": RAPIDAPI_KEY,
+                "x-rapidapi-host": "tiktok-download-without-watermark.p.rapidapi.com"
+            }
+        });
 
+        const data = await res.json();
 
-    const data = await res.json()
+        if (!data.data) {
+            await c.api.deleteMessage(c.chat.id, message.message_id);
+            return c.reply(`❌ Error: ${data.msg || "Unknown error occurred."}`);
+        }
 
-    if (!data.msg) {
-        return c.reply(`Oops ${data.msg}`)
-            .then(async () => await c.api.deleteMessage(c.chatId as number, message.message_id));
+        if (data.data.images) {
+            await c.replyWithMediaGroup(
+                data.data.images.map((image: string) => new InputMediaPhoto(image))
+            );
+            await c.api.deleteMessage(c.chat.id, message.message_id);
+            return c.reply("✅ Completed! Type: Photo");
+        }
+
+        if (data.data.play && (data.data.play as string).includes(".mp4")) {
+            await c.api.sendVideo(c.chat.id, data.data.play, {
+                caption: "✅ Completed! Type: Video"
+            });
+            await c.api.deleteMessage(c.chat.id, message.message_id);
+            return;
+        }
+
+        await c.reply("❌ No media found in the TikTok link.");
+
+    } catch (error) {
+        console.error("❌ Error fetching TikTok API:", error);
+        return c.reply("❌ Failed to process TikTok link.");
     }
+});
 
-    if (data.data.images) {
-        return await c.replyWithMediaGroup(data.data.images.map((image: string) => {
-            return InputMediaBuilder.photo(image)
-        })).then(async () => {
-            await c.reply("completed! ✅, type:photo")
-            await c.api.deleteMessage(c.chatId as number, message.message_id)
-        })
-    }
-
-    if ((data.data.play as string).includes(".mp4")) {
-        return await c.api.sendVideo(c.chatId as number, data.data.play, {
-            caption: "completed! ✅, type:video"
-        }).then(async () => await c.api.deleteMessage(c.chatId as number, message.message_id))
-    }
-
-})
-
+// 📌 ERROR HANDLING
 bot.catch((error) => {
-    console.log(error.message)
-})
+    console.error("Bot error:", error.message);
+});
 
-
-export default webhookCallback(bot, 'next-js')
+// ✅ EXPORT WEBHOOK
+export default webhookCallback(bot, "next-js");
