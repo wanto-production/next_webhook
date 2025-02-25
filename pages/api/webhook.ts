@@ -29,7 +29,7 @@ bot.on("message", async (c) => {
 
     c.reply(JSON.stringify(data))
 
-    if (!data.msg) {
+    if (data.msg) {
         return c.reply(`Oops ${data.msg}`)
             .then(() => c.api.deleteMessage(c.chatId as number, message.message_id));
     }
