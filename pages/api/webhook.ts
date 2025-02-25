@@ -27,9 +27,7 @@ bot.on("message", async (c) => {
 
     const data = await res.json()
 
-    c.reply(JSON.stringify(data))
-
-    if (data.msg) {
+    if (data.code < 0) {
         return c.reply(`Oops ${data.msg}`)
             .then(() => c.api.deleteMessage(c.chatId as number, message.message_id));
     }
@@ -43,7 +41,7 @@ bot.on("message", async (c) => {
         })
     }
 
-    if ((data.data.play as string).includes(".mp4")) {
+    if ((data.data.play as string).includes("mp4")) {
         return c.api.sendVideo(c.chatId as number, data.data.play, {
             caption: "completed! ✅, type:video"
         }).then(() => c.api.deleteMessage(c.chatId as number, message.message_id))
