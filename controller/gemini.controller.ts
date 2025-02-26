@@ -16,8 +16,7 @@ export class GeminiController {
 
         const response = await chat.sendMessage(userMessage)
 
-        ctx.reply(JSON.stringify(response))
-
+        console.log(userId, userMessage, response)
     }
 }
 
