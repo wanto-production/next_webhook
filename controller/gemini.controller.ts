@@ -49,7 +49,7 @@ export class GeminiController {
             console.log(`Gemini digunakan oleh ${ctx.from?.username}, bertanya: ${userMessage}`);
 
             // Kirim balasan dan hapus pesan loading
-            return ctx.reply(response, {
+            return ctx.reply(JSON.stringify(response), {
                 parse_mode: "Markdown",
                 reply_to_message_id: ctx.message.message_id,
             }).then(() => ctx.api.deleteMessage(ctx.chatId!, loadingMessage.message_id));
