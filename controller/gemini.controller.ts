@@ -1,4 +1,5 @@
 import type { Context } from 'grammy';
+import { model } from '@/utils/gemini';
 
 export class GeminiController {
 
@@ -8,8 +9,16 @@ export class GeminiController {
         if (!body) {
             return ctx.reply("❌ Tolong masukkan teks setelah /say!");
         }
-        ctx.reply(`Kamu berkata: ${body}`);
 
+        const [message, result] = await Promise.all([
+            ctx.reply("generate response..."),
+            model.generateContent(body)
+        ])
+
+        return await Promise.all([
+            ctx.reply(result.response.text()),
+            ctx.api.deleteMessage(ctx.chatId!, message.message_id)
+        ])
     }
 
 }
