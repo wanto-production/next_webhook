@@ -1,6 +1,6 @@
 import { Bot, webhookCallback } from "grammy";
 import { MessageController } from "@/controller/message.controller";
-import { GeminiController } from '@/controller/gemini.controller';
+//import { GeminiController } from '@/controller/gemini.controller';
 
 const bot = new Bot(process.env["TELEGRAM_TOKEN"] as string)
 
