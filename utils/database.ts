@@ -5,7 +5,7 @@ export const db = createClient({
     authToken: process.env["TURSO_KEY"]!
 })
 
-export async function getSession(userId: any) {
+export async function getSession(userId: any): Promise<any[]> {
     const result = await db.execute({
         sql: "SELECT chat_history FROM sessions WHERE user_id = $userId",
         args: { userId },

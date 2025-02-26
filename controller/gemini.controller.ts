@@ -12,7 +12,9 @@ export class GeminiController {
 
         let chatHistory = await getSession(userId) || []
 
-        ctx.reply(JSON.stringify(chatHistory))
+        const chat = model.startChat({ history: chatHistory })
+
+        ctx.reply(JSON.stringify(chat))
 
     }
 }
