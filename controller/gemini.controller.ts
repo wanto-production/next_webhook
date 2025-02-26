@@ -43,7 +43,7 @@ export class GeminiController {
 
                 await saveSession(userId, chatHistory);
 
-                return ctx.reply(response).then(() => ctx.api.deleteMessage(ctx.chatId!, message.message_id))
+                return ctx.reply(response, { parse_mode: "Markdown" }).then(() => ctx.api.deleteMessage(ctx.chatId!, message.message_id))
             } catch (err) {
                 //@ts-ignore
                 return ctx.reply(`Ooops ada yang error: ${err.message}`)
