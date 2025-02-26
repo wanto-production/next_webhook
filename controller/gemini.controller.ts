@@ -16,7 +16,7 @@ export class GeminiController {
             model.generateContent(body)
         ])
 
-        console.log(`gemini usage by ${ctx.from?.username}`)
+        console.log(`gemini usage by ${ctx.from?.username}, ask: ${body}`)
 
         return await Promise.all([
             ctx.reply(result.response.text(), {
