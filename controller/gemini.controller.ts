@@ -12,29 +12,8 @@ export class GeminiController {
 
         let chatHistory = await getSession(userId) || []
 
-        const chat = model.startChat({ history: chatHistory })
+        ctx.reply(JSON.stringify(chatHistory))
 
-        try {
-            const [message, result] = await Promise.all([
-                ctx.reply("generate response..."),
-                chat.sendMessage(userMessage)
-            ])
-
-            const response = result.response.text()
-
-            chatHistory.push({ role: "user", parts: [userMessage] });
-            chatHistory.push({ role: "model", parts: [response] });
-            await saveSession(userId, chatHistory);
-
-            return ctx.reply(response, {
-                parse_mode: "Markdown"
-            })
-                .then(() => ctx.api.deleteMessage(ctx.chatId!, message.message_id));
-
-        } catch (err) {
-            //@ts-ignore
-            return c.reply(`Oops something wrong: ${err.message}`)
-        }
     }
 }
 
