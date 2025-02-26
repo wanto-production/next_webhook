@@ -22,11 +22,16 @@ export class GeminiController {
 
         // Jika user membalas pesan bot, gunakan teks balasannya sebagai input
         if (isReplyToBot) {
-            const repliedText = replyMessage?.text;
-            if (!repliedText) {
-                return ctx.reply("❌ Maaf, saya hanya bisa membaca balasan teks!");
+            if (isReplyToBot) {
+                userMessage = text.replace(/^\/gemini\s*/, "").trim(); // Ambil teks setelah /gemini
+
+                if (!userMessage) {
+                    return ctx.reply("❌ Tolong masukkan teks setelah /gemini!\n\n*Contoh:* `/gemini Apa itu AI?`", {
+                        parse_mode: "Markdown",
+                    });
+                }
             }
-            userMessage = text; // Gunakan teks yang diketik user saat membalas
+
         }
 
         if (!userMessage) {
