@@ -1,11 +1,12 @@
 import { createClient } from "@libsql/client";
+import type { Content } from "@google/generative-ai";
 
 export const db = createClient({
     url: process.env["TURSO_URL"]!,
     authToken: process.env["TURSO_KEY"]!
 })
 
-export async function getSession(userId: any): Promise<any[]> {
+export async function getSession(userId: any): Promise<Content[] | []> {
     const result = await db.execute({
         sql: "SELECT chat_history FROM sessions WHERE user_id = $userId",
         args: { userId },
@@ -22,10 +23,10 @@ export async function saveSession(userId: any, chatHistory: any) {
     await db.execute({
         sql: `
             INSERT INTO sessions (user_id, chat_history) 
-            VALUES (?, ?) 
+            VALUES ($userId, $historyJson) 
             ON CONFLICT(user_id) 
             DO UPDATE SET chat_history = excluded.chat_history
         `,
-        args: [userId, historyJson],
+        args: { userId, historyJson },
     });
 }

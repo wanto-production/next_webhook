@@ -6,18 +6,20 @@ export class GeminiController {
     static async main(ctx: Context) {
         // Pastikan update berisi pesan byte
         if (ctx.message?.text) {
-            const userMessage = ctx.message?.text?.split(' ').slice(1).join(' ')!
+            const userMessage = ctx.message?.text.split(' ').slice(1).join(' ')!
             const userId = ctx.from?.id
 
             if (!userMessage) return ctx.reply("please fill text after /gemini");
 
             let chatHistory = await getSession(userId) || []
 
+
             const chat = model.startChat({ history: chatHistory })
 
             const response = await chat.sendMessage(userMessage)
 
             console.log(userId, userMessage, response)
+
         }
     }
 }
