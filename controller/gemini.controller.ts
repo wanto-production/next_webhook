@@ -13,9 +13,6 @@ export class GeminiController {
 
             let chatHistory = await getSession(userId) || []
 
-
-            const chat = model.startChat({ history: chatHistory })
-
             //const response = await chat.sendMessage(userMessage)
 
             //console.log(userId, userMessage, response)
