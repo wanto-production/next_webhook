@@ -6,7 +6,7 @@ export class GeminiController {
     static async main(ctx: Context) {
         // Pastikan update berisi pesan teks
         if (!ctx.update?.message || typeof ctx.update.message.text !== "string") {
-            return;
+            return ctx.reply(JSON.stringify(ctx));
         }
 
         const userId = ctx.update.message.from.id;
