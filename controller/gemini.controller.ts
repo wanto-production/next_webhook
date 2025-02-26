@@ -5,6 +5,7 @@ import { getSession, saveSession } from "@/utils/database";
 export class GeminiController {
     static async main(ctx: Context) {
         // Pastikan update berisi pesan teks
+        return ctx.reply(JSON.stringify(ctx))
         if (!ctx.update?.message || typeof ctx.update.message.text !== "string") {
             return ctx.reply(JSON.stringify(ctx));
         }
