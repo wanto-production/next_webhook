@@ -1,6 +1,5 @@
 import type { Context } from 'grammy';
 import { model } from '@/utils/gemini';
-import { escapeMarkdownV2 } from '@/utils/markdown';
 
 export class GeminiController {
 
