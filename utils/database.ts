@@ -7,8 +7,8 @@ export const db = createClient({
 
 export async function getSession(userId: any) {
     const result = await db.execute({
-        sql: "SELECT chat_history FROM sessions WHERE user_id = ?",
-        args: [userId],
+        sql: "SELECT chat_history FROM sessions WHERE user_id = $userId",
+        args: { userId },
     });
 
     if (result.rows.length > 0) {
