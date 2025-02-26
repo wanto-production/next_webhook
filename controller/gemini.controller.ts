@@ -27,18 +27,27 @@ export class GeminiController {
             }
 
             const chat = model.startChat({ history: chatHistory })
+            try {
 
-            const send = await chat.sendMessage(userMessage)
-            const response = send.response.text()
+                const [send, message] = await Promise.all([
+                    chat.sendMessage(userMessage),
+                    ctx.reply("generate response...")
+                ])
 
-            chatHistory.push({
-                role: "model",
-                parts: [{ text: response }]
-            });
-            await saveSession(userId, chatHistory);
+                const response = send.response.text()
 
-            ctx.reply(response)
+                chatHistory.push({
+                    role: "model",
+                    parts: [{ text: response }]
+                });
 
+                await saveSession(userId, chatHistory);
+
+                return ctx.reply(response).then(() => ctx.api.deleteMessage(ctx.chatId!, message.message_id))
+            } catch (err) {
+                //@ts-ignore
+                return ctx.reply(`Ooops ada yang error: ${err.message}`)
+            }
         }
     }
 }
