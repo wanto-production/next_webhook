@@ -30,25 +30,26 @@ bot.on("message", async (c) => {
     console.log(`download completed from: ${c.from.username}`)
 
     if (data.code < 0) {
-        return c.reply(`Oops ${data.msg}`)
-            .then(() => c.api.deleteMessage(c.chatId as number, message.message_id));
+        return await Promise.all([
+            c.reply(`Oops ${data.msg}`),
+            c.api.deleteMessage(c.chatId as number, message.message_id)
+        ])
     }
 
     if (data.data.images) {
-        return c.replyWithMediaGroup(data.data.images.map((image: string) => {
-            return InputMediaBuilder.photo(image)
-        })).then(async () => {
-            await c.reply("completed! ✅, type:photo")
-            await c.api.deleteMessage(c.chatId as number, message.message_id)
-        })
+        return await Promise.all([
+            c.replyWithMediaGroup(data.data.images.map((image: string) => InputMediaBuilder.photo(image))),
+            c.reply("completed! ✅, type:photo"),
+            c.api.deleteMessage(c.chatId as number, message.message_id),
+        ])
     }
 
     if ((data.data.play as string).includes("mp4")) {
-        return c.api.sendVideo(c.chatId as number, data.data.play, {
-            caption: "completed! ✅, type:video"
-        }).then(() => c.api.deleteMessage(c.chatId as number, message.message_id))
+        return await Promise.all([
+            c.api.sendVideo(c.chatId as number, data.data.play, { caption: "completed! ✅, type:video" }),
+            c.api.deleteMessage(c.chatId as number, message.message_id),
+        ])
     }
-
 })
 
 bot.catch((error) => {
