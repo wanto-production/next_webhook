@@ -32,14 +32,14 @@ export class MessageController {
         if (data.data.images) {
             return await Promise.all([
                 c.replyWithMediaGroup(data.data.images.map((image: string) => InputMediaBuilder.photo(image))),
-                c.reply("completed! ✅, type:photo"),
+                c.reply(`${c.message?.text}\n\n @TiktokConverterRobot\ncompleted! ✅`),
                 c.api.deleteMessage(c.chatId as number, message.message_id),
             ])
         }
 
         if ((data.data.play as string).includes("mp4")) {
             return await Promise.all([
-                c.api.sendVideo(c.chatId as number, data.data.play, { caption: "completed! ✅, type:video" }),
+                c.api.sendVideo(c.chatId as number, data.data.play, { caption: `${c.message?.text}\n\n @TiktokConverterRobot\ncompleted! ✅` }),
                 c.api.deleteMessage(c.chatId as number, message.message_id),
             ])
         }
