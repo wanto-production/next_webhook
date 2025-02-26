@@ -4,33 +4,44 @@ import { getSession, saveSession } from "@/utils/database";
 
 export class GeminiController {
     static async main(ctx: Context) {
-        if (!ctx.message || typeof ctx.message.text !== "string") return ctx.reply("Maaf, saya hanya bisa memproses pesan teks.");
+        // Pastikan update berisi pesan teks
+        if (!ctx.update?.message || typeof ctx.update.message.text !== "string") {
+            return;
+        }
 
-        const userId = ctx.message.from.id;
-        const text = ctx.message.text.trim();
+        const userId = ctx.update.message.from.id;
+        const text = ctx.update.message.text.trim();
 
-        // Pastikan hanya berjalan jika perintahnya adalah /gemini
-        if (!text.startsWith("/gemini")) return;
+        // Hanya jalankan jika menggunakan perintah /gemini atau membalas chat AI
+        const isReplyToBot = ctx.update.message.reply_to_message?.from?.is_bot ?? false;
+        if (!text.startsWith("/gemini") && !isReplyToBot) return;
 
-        // Ambil teks setelah /gemini
-        const userMessage = text.replace(/^\/gemini\s*/, "").trim();
+        let userMessage = text.replace(/^\/gemini\s*/, "").trim();
+
+        // Jika user membalas pesan bot, gunakan teks balasannya sebagai input
+        if (isReplyToBot) {
+            const repliedText = ctx.update.message.reply_to_message?.text;
+            if (!repliedText) {
+                return ctx.reply("❌ Maaf, saya hanya bisa membaca balasan teks!");
+            }
+            userMessage = text; // Gunakan teks yang diketik user saat membalas
+        }
+
         if (!userMessage) {
             return ctx.reply("❌ Tolong masukkan teks setelah /gemini!\n\n*Contoh:* `/gemini Apa itu AI?`", {
                 parse_mode: "Markdown",
             });
         }
 
-        // Cek apakah pesan adalah reply ke bot
-        const isReplyToBot = ctx.message.reply_to_message && ctx.message.reply_to_message.from?.is_bot;
-
         let chatHistory = await getSession(userId);
 
-        // Jika tidak reply ke bot, reset chat history
+        // Jika bukan reply ke bot, reset history
         if (!isReplyToBot) {
             chatHistory = [];
         }
 
         const chat = model.startChat({ history: chatHistory });
+
 
         try {
             const [loadingMessage, result] = await Promise.all([
@@ -51,7 +62,7 @@ export class GeminiController {
             // Kirim balasan dan hapus pesan loading
             return ctx.reply(response, {
                 parse_mode: "Markdown",
-                reply_to_message_id: ctx.message.message_id,
+                reply_to_message_id: ctx.message?.message_id,
             }).then(() => ctx.api.deleteMessage(ctx.chatId!, loadingMessage.message_id));
         } catch (error) {
             console.error("❌ Error saat memproses Gemini:", error);
