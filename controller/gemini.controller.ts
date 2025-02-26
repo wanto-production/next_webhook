@@ -16,6 +16,8 @@ export class GeminiController {
             model.generateContent(body)
         ])
 
+        console.log(`gemini usage by ${ctx.from?.username}`)
+
         return await Promise.all([
             ctx.reply(result.response.text(), {
                 parse_mode: "Markdown"
