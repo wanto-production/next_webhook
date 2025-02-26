@@ -29,9 +29,9 @@ export class GeminiController {
             const chat = model.startChat({ history: chatHistory })
             try {
 
-                const [send, message] = await Promise.all([
-                    chat.sendMessage(userMessage),
-                    ctx.reply("generate response...")
+                const [message, send] = await Promise.all([
+                    ctx.reply("generate response..."),
+                    chat.sendMessage(userMessage)
                 ])
 
                 const response = send.response.text()
