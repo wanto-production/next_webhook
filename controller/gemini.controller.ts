@@ -1,5 +1,6 @@
 import type { Context } from 'grammy';
 import { model } from '@/utils/gemini';
+import { escapeMarkdownV2 } from '@/utils/markdown';
 
 export class GeminiController {
 
@@ -16,7 +17,7 @@ export class GeminiController {
         ])
 
         return await Promise.all([
-            ctx.reply(result.response.text(), {
+            ctx.reply(escapeMarkdownV2(result.response.text()), {
                 parse_mode: "MarkdownV2"
             }),
             ctx.api.deleteMessage(ctx.chatId!, message.message_id)
