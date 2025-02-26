@@ -17,8 +17,8 @@ export class GeminiController {
         ])
 
         return await Promise.all([
-            ctx.reply(escapeMarkdownV2(result.response.text()), {
-                parse_mode: "MarkdownV2"
+            ctx.reply(result.response.text(), {
+                parse_mode: "Markdown"
             }),
             ctx.api.deleteMessage(ctx.chatId!, message.message_id)
         ])
