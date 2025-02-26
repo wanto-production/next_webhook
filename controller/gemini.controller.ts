@@ -14,7 +14,9 @@ export class GeminiController {
 
         const chat = model.startChat({ history: chatHistory })
 
-        ctx.reply(JSON.stringify(chat))
+        const response = await chat.sendMessage(userMessage)
+
+        ctx.reply(response.response.text())
 
     }
 }
