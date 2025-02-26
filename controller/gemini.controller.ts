@@ -9,8 +9,6 @@ export class GeminiController {
             const userMessage = ctx.message?.text.split(' ').slice(1).join(' ')!
             const userId = ctx.from?.id
 
-            return ctx.reply(userMessage);
-
             if (!userMessage) return ctx.reply("please fill text after /gemini");
 
             let chatHistory = await getSession(userId) || []
@@ -18,9 +16,10 @@ export class GeminiController {
 
             const chat = model.startChat({ history: chatHistory })
 
-            const response = await chat.sendMessage(userMessage)
+            //const response = await chat.sendMessage(userMessage)
 
-            console.log(userId, userMessage, response)
+            //console.log(userId, userMessage, response)
+            ctx.reply(JSON.stringify(chatHistory))
 
         }
     }
