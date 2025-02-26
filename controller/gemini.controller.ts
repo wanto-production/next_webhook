@@ -4,7 +4,7 @@ import { getSession, saveSession } from "@/utils/database";
 
 export class GeminiController {
     static async main(ctx: Context) {
-        if (!ctx.message?.text) return ctx.reply("Maaf, saya hanya bisa memproses pesan teks.");
+        if (!ctx.message || typeof ctx.message.text !== "string") return ctx.reply("Maaf, saya hanya bisa memproses pesan teks.");
 
         const userId = ctx.message.from.id;
         const text = ctx.message.text.trim();
