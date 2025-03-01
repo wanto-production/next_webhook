@@ -24,6 +24,9 @@ export class ResetController {
                 await c.reply("reset chat history canceled")
                 break;
             }
+            default: {
+                await c.reply("unknow command")
+            }
         }
     }
 }
