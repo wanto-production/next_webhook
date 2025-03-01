@@ -15,13 +15,16 @@ export function defineMethod({ middlewares }: Props) {
         const originalMethod = descriptor.value;
 
         descriptor.value = async function (...args: any[]) {
-            // Assuming the first argument is what the middleware needs
-            for (const middleware of middlewares) {
-                await middleware(args[0]); // Call the middleware with the context
-            }
+            try {
+                for (const middleware of middlewares) {
+                    await middleware(args[0]); // Middleware dijalankan lebih dulu
+                }
 
-            // Call the original method
-            return originalMethod.apply(this, args);
+                // Jika semua middleware berhasil, jalankan method utama
+                return originalMethod.apply(this, args);
+            } catch (error) {
+                console.log(`Middleware blocked execution: ${(error as Error).message}`);
+            }
         };
 
         return descriptor; // Return the modified descriptor

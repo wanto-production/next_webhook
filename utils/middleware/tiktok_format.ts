@@ -5,6 +5,7 @@ export async function tiktokFormatMiddleware(c: Context): Promise<any> {
         c.message?.text &&
         !RegExp('https?:\/\/(vt|vn|vm)\.tiktok\.com\/[a-zA-Z0-9]+').test(c.message.text)
     ) {
-        return await c.reply("Oops wrong format!");
+        await c.reply("Oops wrong format!")
+        throw new Error("Invalid TikTok link"); // Hentikan eksekusi
     }
 }
