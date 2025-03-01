@@ -4,51 +4,42 @@ import { getSession, saveSession } from "@/utils/database";
 
 export class GeminiController {
     static async main(ctx: Context) {
-        // Pastikan update berisi pesan byte
-        if (ctx.message?.text) {
-            const userMessage = ctx.message?.text.split(' ').slice(1).join(' ')!
-            const userId = ctx.from?.id
+        if (!ctx.message?.text) return;
 
-            if (!userMessage) return ctx.reply("please fill text after /gemini");
+        const userMessage = ctx.message.text.split(" ").slice(1).join(" ");
+        if (!userMessage) return ctx.reply("Please fill text after /gemini");
 
-            let chatHistory = await getSession(userId)
+        const userId = ctx.from?.id;
+        let chatHistory = (await getSession(userId)) || [];
 
-            if (chatHistory.length > 0) {
-                chatHistory = chatHistory.map(entry => ({
-                    role: entry.role,
-                    parts: entry.parts.map(p => (typeof p === "string" ? { text: p } : p)) // Konversi string ke objek { text: p }
-                }));
+        // Konversi history agar sesuai format, lalu tambahkan input user
+        chatHistory = [
+            ...chatHistory.map(entry => ({
+                role: entry.role,
+                parts: entry.parts.map(p => (typeof p === "string" ? { text: p } : p))
+            })),
+            { role: "user", parts: [{ text: userMessage }] }
+        ];
 
-                chatHistory.push({
-                    role: "user",
-                    parts: [{ text: userMessage }]
-                });
+        const chat = model.startChat({ history: chatHistory });
 
-            }
+        try {
+            const message = await ctx.reply("Generating response...");
+            const send = await chat.sendMessage(userMessage);
+            const response = send.response.text();
 
-            const chat = model.startChat({ history: chatHistory })
-            try {
+            // Simpan respons ke dalam history
+            chatHistory.push({ role: "model", parts: [{ text: response }] });
+            await saveSession(userId, chatHistory);
 
-                const message = await ctx.reply("generate response...")
-                const send = await chat.sendMessage(userMessage)
-
-
-                const response = send.response.text()
-
-                chatHistory.push({
-                    role: "model",
-                    parts: [{ text: response }]
-                });
-
-                await saveSession(userId, chatHistory);
-
-                return ctx.reply(response, { parse_mode: "Markdown" }).then(() => ctx.api.deleteMessage(ctx.chatId!, message.message_id))
-            } catch (err) {
-                //@ts-ignore
-                return ctx.reply(`Ooops ada yang error: ${err.message}`)
-            }
+            // Kirim jawaban dan hapus pesan "Generating response..." secara paralel
+            await Promise.all([
+                ctx.reply(response, { parse_mode: "Markdown" }),
+                ctx.api.deleteMessage(ctx.chatId!, message.message_id)
+            ]);
+        } catch (err) {
+            console.error(err);
+            return ctx.reply(`Oops! An error occurred: ${(err as Error).message}`);
         }
     }
 }
-
-
