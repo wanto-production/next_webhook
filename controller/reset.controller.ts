@@ -14,6 +14,11 @@ export class ResetController {
     }
 
     static async callback(c: Context) {
+        await Promise.all([
+            c.answerCallbackQuery(),
+            c.deleteMessage(),
+        ])
+
         switch (c.callbackQuery?.data) {
             case "reset(yes)": {
                 await resetSession(c.from?.id as number)
