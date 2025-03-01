@@ -14,7 +14,7 @@ export class ResetController {
     }
 
     static async callback(c: Context) {
-        switch (c.message?.text) {
+        switch (c.callbackQuery?.data) {
             case "reset(yes)": {
                 await resetSession(c.from?.id as number)
                 await c.reply("history has been reset!")

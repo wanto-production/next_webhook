@@ -17,12 +17,7 @@ bot.command("start", (c) => {
 
 bot.command('gemini', GeminiController.main)
 bot.command('reset', ResetController.main)
-bot.on("callback_query", (c) => {
-
-    console.log(c)
-
-    ResetController.callback(c)
-})
+bot.on("callback_query", ResetController.callback)
 
 bot.on("message", MessageController.main)
 
