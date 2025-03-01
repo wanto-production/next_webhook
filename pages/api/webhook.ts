@@ -16,10 +16,10 @@ bot.command("start", (c) => {
 })
 
 bot.command('gemini', GeminiController.main)
-bot.on("message", MessageController.main)
 bot.command('reset', ResetController.main)
-
 bot.hears(["reset(yes)", "reset(no)"], ResetController.callback)
+
+bot.on("message", MessageController.main)
 
 bot.catch((error) => {
     console.log(error.message)
