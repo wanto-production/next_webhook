@@ -30,3 +30,10 @@ export async function saveSession(userId: any, chatHistory: any) {
         args: { userId, historyJson },
     });
 }
+
+export async function resetSession(userId: number) {
+    await db.execute({
+        sql: "UPDATE sessions SET chat_history = '[]' WHERE user_id = ?",
+        args: [userId],
+    });
+}
