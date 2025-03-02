@@ -3,6 +3,7 @@ import { model } from "@/utils/gemini";
 import { getSession, saveSession } from "@/utils/database";
 import TurndownService from "turndown";
 import { marked } from "marked";
+import { escapeMarkdown } from "@/utils/markdown";
 
 export class GeminiController {
     static async main(ctx: Context) {
@@ -46,7 +47,7 @@ export class GeminiController {
             const htmlRes = await marked(response)
             // Kirim jawaban dan hapus pesan "Generating response..." secara paralel
             await Promise.all([
-                ctx.reply(turndownServ.turndown(htmlRes), { parse_mode: "MarkdownV2" }),
+                ctx.reply(escapeMarkdown(turndownServ.turndown(htmlRes)), { parse_mode: "MarkdownV2" }),
                 ctx.api.deleteMessage(ctx.chatId!, message.message_id)
             ]);
         } catch (err) {
@@ -96,7 +97,7 @@ export class GeminiController {
                     console.log(htmlRes)
                     // Kirim jawaban dan hapus pesan "Generating response..." secara paralel
                     await Promise.all([
-                        c.reply(turndownServ.turndown(htmlRes), { parse_mode: "MarkdownV2" }),
+                        c.reply(escapeMarkdown(turndownServ.turndown(htmlRes)), { parse_mode: "MarkdownV2" }),
                         c.api.deleteMessage(c.chatId!, message.message_id)
                     ]);
                 } catch (err) {
