@@ -1,11 +1,20 @@
 import type { Context } from "grammy";
 import { model } from "@/utils/gemini";
 import { getSession, saveSession } from "@/utils/database";
-import { escapeMarkdownV2 } from '@/utils/markdown'
+import TurndownService from "turndown";
 import { marked } from "marked";
 
 export class GeminiController {
     static async main(ctx: Context) {
+
+        const turndownServ = new TurndownService({
+            headingStyle: "atx",
+            hr: "---",
+            bulletListMarker: "-",
+            codeBlockStyle: "fenced",
+        })
+
+
         if (!ctx.message?.text) return;
 
         const userMessage = ctx.message.text.split(" ").slice(1).join(" ");
@@ -37,7 +46,7 @@ export class GeminiController {
             const htmlRes = await marked(response)
             // Kirim jawaban dan hapus pesan "Generating response..." secara paralel
             await Promise.all([
-                ctx.reply(htmlRes, { parse_mode: "HTML" }),
+                ctx.reply(turndownServ.turndown(htmlRes), { parse_mode: "MarkdownV2" }),
                 ctx.api.deleteMessage(ctx.chatId!, message.message_id)
             ]);
         } catch (err) {
@@ -50,6 +59,14 @@ export class GeminiController {
         if (c.message?.reply_to_message) {
             const messageReply = c.message.reply_to_message
             if (messageReply.from?.id === c.me.id) {
+                const turndownServ = new TurndownService({
+                    headingStyle: "atx",
+                    hr: "---",
+                    bulletListMarker: "-",
+                    codeBlockStyle: "fenced",
+                })
+
+
                 const body = c.message.text!
                 const userId = c.from?.id!
 
@@ -79,7 +96,7 @@ export class GeminiController {
                     console.log(htmlRes)
                     // Kirim jawaban dan hapus pesan "Generating response..." secara paralel
                     await Promise.all([
-                        c.reply(htmlRes, { parse_mode: "HTML" }),
+                        c.reply(turndownServ.turndown(htmlRes), { parse_mode: "HTML" }),
                         c.api.deleteMessage(c.chatId!, message.message_id)
                     ]);
                 } catch (err) {
