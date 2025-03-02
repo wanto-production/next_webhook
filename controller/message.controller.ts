@@ -1,11 +1,13 @@
 import { defineMethod } from "@/utils/decorators/defineMethod";
 import { tiktokFormatMiddleware } from "@/utils/middleware/tiktok_format";
+import { replyMiddleware } from "@/utils/middleware/reply_middleware";
+
 import type { Context } from "grammy";
 import { InputMediaBuilder } from "grammy";
 
 export class MessageController {
 
-    @defineMethod({ middlewares: [tiktokFormatMiddleware] })
+    @defineMethod({ middlewares: [replyMiddleware, tiktokFormatMiddleware] })
     static async main(c: Context): Promise<void> {
         try {
             const message = await c.reply("wait🕛...");
