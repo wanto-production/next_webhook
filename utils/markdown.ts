@@ -1,26 +1,9 @@
-function escapeMarkdownV2(text: string): string {
-    return text.replace(/[_*[\]()~`>#\+\-=|{}.!\\]/g, '\\$&');
-}
-
-// Fungsi untuk mengonversi teks Markdown ke format MarkdownV2
-export function convertMarkdownToTelegramMarkdownV2(markdown: string): string {
-    return markdown
-        .replace(/\*/g, '\\*')   // Escape bintang (*)
-        .replace(/_/g, '\\_')    // Escape underscore (_)
-        .replace(/\[/g, '\\[')   // Escape bracket kiri ([)
-        .replace(/\]/g, '\\]')   // Escape bracket kanan (])
-        .replace(/\(/g, '\\(')   // Escape kurung buka (()
-        .replace(/\)/g, '\\)')   // Escape kurung tutup ())
-        .replace(/~/g, '\\~')    // Escape tilde (~)
-        .replace(/`/g, '\\`')    // Escape backtick (`)
-        .replace(/>/g, '\\>')    // Escape tanda lebih besar (>)
-        .replace(/#/g, '\\#')    // Escape pagar (#)
-        .replace(/\+/g, '\\+')   // Escape plus (+)
-        .replace(/-/g, '\\-')    // Escape minus (-)
-        .replace(/=/g, '\\=')    // Escape sama dengan (=)
-        .replace(/\|/g, '\\|')   // Escape pipe (|)
-        .replace(/{/g, '\\{')    // Escape kurung kurawal buka ({)
-        .replace(/}/g, '\\}')    // Escape kurung kurawal tutup (})
-        .replace(/\./g, '\\.')   // Escape titik (.)
-        .replace(/!/g, '\\!');   // Escape tanda seru (!)l
+export function escapeMarkdownV2(text: string): string {
+    return text
+        .replace(/(\*{3,})/g, "**") // Menghindari *** yang tidak jelas
+        .replace(/(\*{2})([^*]+)\1?/g, "**$2**") // Memastikan **bold** selalu ditutup
+        .replace(/(\*)([^*]+)\1?/g, "*$2*") // Memastikan *italic* selalu ditutup
+        .replace(/(`{2,})/g, "`") // Menghindari ```` yang berlebihan
+        .replace(/(\[)([^\]]+)(\]\()/g, "[$2](") // Menormalkan format link
+        .replace(/\[(.*?)\]\((?!http)(.*?)\)/g, "[$1](https://$2)"); // Auto-perbaiki link tanpa protocol}
 }

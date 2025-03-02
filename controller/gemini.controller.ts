@@ -1,7 +1,7 @@
 import type { Context } from "grammy";
 import { model } from "@/utils/gemini";
 import { getSession, saveSession } from "@/utils/database";
-import { convertMarkdownToTelegramMarkdownV2 } from '@/utils/markdown'
+import { escapeMarkdownV2 } from '@/utils/markdown'
 
 export class GeminiController {
     static async main(ctx: Context) {
@@ -35,7 +35,7 @@ export class GeminiController {
 
             // Kirim jawaban dan hapus pesan "Generating response..." secara paralel
             await Promise.all([
-                ctx.reply(convertMarkdownToTelegramMarkdownV2(response), { parse_mode: "MarkdownV2" }),
+                ctx.reply(escapeMarkdownV2(response), { parse_mode: "Markdown" }),
                 ctx.api.deleteMessage(ctx.chatId!, message.message_id)
             ]);
         } catch (err) {
@@ -76,7 +76,7 @@ export class GeminiController {
                     console.log(response)
                     // Kirim jawaban dan hapus pesan "Generating response..." secara paralel
                     await Promise.all([
-                        c.reply(convertMarkdownToTelegramMarkdownV2(response), { parse_mode: "MarkdownV2" }),
+                        c.reply(escapeMarkdownV2(response), { parse_mode: "Markdown" }),
                         c.api.deleteMessage(c.chatId!, message.message_id)
                     ]);
                 } catch (err) {
