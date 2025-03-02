@@ -42,4 +42,10 @@ export class GeminiController {
             return ctx.reply(`Oops! An error occurred: ${(err as Error).message}`);
         }
     }
+
+    static async reply(c: Context) {
+        if (c.message?.reply_to_message) {
+            console.log(c)
+        }
+    }
 }
