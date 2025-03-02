@@ -104,11 +104,10 @@ export class GeminiController {
             chatHistory.push({ role: "model", parts: [{ text: response }] });
             await saveSession(userId, chatHistory);
 
-            const htmlRes = await marked(response);
-            const markdownRes = escapeMarkdown(turndownServ.turndown(htmlRes))
+            const htmlRes = await marked(response, { gfm: true, breaks: true });
 
             await Promise.all([
-                c.reply(markdownRes, { parse_mode: "MarkdownV2" }),
+                c.reply(htmlRes, { parse_mode: "HTML" }),
                 c.api.deleteMessage(c.chatId!, message.message_id)
             ]);
         } catch (err) {
