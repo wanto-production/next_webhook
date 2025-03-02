@@ -51,10 +51,11 @@ export class GeminiController {
             await saveSession(userId, chatHistory);
 
             const htmlRes = await marked(response);
+            const markdownRes = escapeMarkdown(turndownServ.turndown(htmlRes))
 
             await Promise.all([
-                ctx.reply(escapeMarkdown(turndownServ.turndown(htmlRes)), { parse_mode: "MarkdownV2" }),
-                ctx.api.deleteMessage(ctx.chatId!, message.message_id)
+                ctx.reply(markdownRes, { parse_mode: "MarkdownV2" }),
+                ctx.api.deleteMessage(ctx.chatId!, message.message_id),
             ]);
 
         } catch (err) {
@@ -104,9 +105,10 @@ export class GeminiController {
             await saveSession(userId, chatHistory);
 
             const htmlRes = await marked(response);
+            const markdownRes = escapeMarkdown(turndownServ.turndown(htmlRes))
 
             await Promise.all([
-                c.reply(escapeMarkdown(turndownServ.turndown(htmlRes)), { parse_mode: "MarkdownV2" }),
+                c.reply(markdownRes, { parse_mode: "MarkdownV2" }),
                 c.api.deleteMessage(c.chatId!, message.message_id)
             ]);
         } catch (err) {
