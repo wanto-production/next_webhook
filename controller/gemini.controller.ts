@@ -72,6 +72,7 @@ export class GeminiController {
                     chatHistory.push({ role: "model", parts: [{ text: response }] });
                     await saveSession(userId, chatHistory);
 
+                    console.log(response)
                     // Kirim jawaban dan hapus pesan "Generating response..." secara paralel
                     await Promise.all([
                         c.reply(response, { parse_mode: "Markdown" }),
