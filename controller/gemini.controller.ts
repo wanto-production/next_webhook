@@ -2,6 +2,7 @@ import type { Context } from "grammy";
 import { model } from "@/utils/gemini";
 import { getSession, saveSession } from "@/utils/database";
 import { escapeMarkdownV2 } from '@/utils/markdown'
+import { marked } from "marked";
 
 export class GeminiController {
     static async main(ctx: Context) {
@@ -33,9 +34,10 @@ export class GeminiController {
             chatHistory.push({ role: "model", parts: [{ text: response }] });
             await saveSession(userId, chatHistory);
 
+            const htmlRes = await marked(response)
             // Kirim jawaban dan hapus pesan "Generating response..." secara paralel
             await Promise.all([
-                ctx.reply(escapeMarkdownV2(response), { parse_mode: "Markdown" }),
+                ctx.reply(htmlRes, { parse_mode: "HTML" }),
                 ctx.api.deleteMessage(ctx.chatId!, message.message_id)
             ]);
         } catch (err) {
@@ -73,10 +75,11 @@ export class GeminiController {
                     chatHistory.push({ role: "model", parts: [{ text: response }] });
                     await saveSession(userId, chatHistory);
 
-                    console.log(response)
+                    const htmlRes = await marked(response)
+                    console.log(htmlRes)
                     // Kirim jawaban dan hapus pesan "Generating response..." secara paralel
                     await Promise.all([
-                        c.reply(escapeMarkdownV2(response), { parse_mode: "Markdown" }),
+                        c.reply(htmlRes, { parse_mode: "HTML" }),
                         c.api.deleteMessage(c.chatId!, message.message_id)
                     ]);
                 } catch (err) {
