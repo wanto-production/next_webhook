@@ -1,20 +1,10 @@
 import type { Context } from "grammy";
 import { model } from "@/utils/gemini";
 import { getSession, saveSession } from "@/utils/database";
-import TurndownService from "turndown";
-import { marked } from "marked";
-import { escapeMarkdown } from "@/utils/markdown";
 
 export class GeminiController {
     static async main(ctx: Context) {
         const generatingMap = new Map()
-        const turndownServ = new TurndownService({
-            headingStyle: "atx",
-            hr: "---",
-            bulletListMarker: "-",
-            codeBlockStyle: "fenced",
-        })
-
         if (!ctx.message?.text) return;
 
 
@@ -50,11 +40,8 @@ export class GeminiController {
             chatHistory.push({ role: "model", parts: [{ text: response }] });
             await saveSession(userId, chatHistory);
 
-            const htmlRes = await marked(response);
-            const markdownRes = escapeMarkdown(turndownServ.turndown(htmlRes))
-
             await Promise.all([
-                ctx.reply(markdownRes, { parse_mode: "MarkdownV2" }),
+                ctx.reply(response, { parse_mode: "Markdown" }),
                 ctx.api.deleteMessage(ctx.chatId!, message.message_id),
             ]);
 
@@ -68,12 +55,6 @@ export class GeminiController {
 
     static async reply(c: Context) {
         const generatingMap = new Map()
-        const turndownServ = new TurndownService({
-            headingStyle: "atx",
-            hr: "---",
-            bulletListMarker: "-",
-            codeBlockStyle: "fenced",
-        })
         if (!c.message?.reply_to_message || c.message.reply_to_message.from?.id !== c.me.id) return;
 
         const userId = c.from?.id!;
@@ -104,13 +85,8 @@ export class GeminiController {
             chatHistory.push({ role: "model", parts: [{ text: response }] });
             await saveSession(userId, chatHistory);
 
-            const renderer = new marked.Renderer();
-            renderer.paragraph = (text) => text + "\n"; // Hilangkan <p> dan ganti dengan newline
-
-
-
-            const htmlRes = await marked(response, { renderer }); await Promise.all([
-                c.reply(htmlRes, { parse_mode: "HTML" }),
+            await Promise.all([
+                c.reply(response, { parse_mode: "Markdown" }),
                 c.api.deleteMessage(c.chatId!, message.message_id)
             ]);
         } catch (err) {
