@@ -104,9 +104,12 @@ export class GeminiController {
             chatHistory.push({ role: "model", parts: [{ text: response }] });
             await saveSession(userId, chatHistory);
 
-            const htmlRes = await marked(response, { gfm: true, breaks: true });
+            const renderer = new marked.Renderer();
+            renderer.paragraph = (text) => text + "\n"; // Hilangkan <p> dan ganti dengan newline
 
-            await Promise.all([
+
+
+            const htmlRes = await marked(response, { renderer }); await Promise.all([
                 c.reply(htmlRes, { parse_mode: "HTML" }),
                 c.api.deleteMessage(c.chatId!, message.message_id)
             ]);
