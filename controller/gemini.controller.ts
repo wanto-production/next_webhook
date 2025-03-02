@@ -47,7 +47,41 @@ export class GeminiController {
         if (c.message?.reply_to_message) {
             const messageReply = c.message.reply_to_message
             if (messageReply.from?.id === c.me.id) {
-                c.reply(`you chat ${c.message?.text}`)
+                const body = c.message.text!
+                const userId = c.from?.id!
+
+                let chatHistory = (await getSession(userId)) || []
+
+                // Konversi history agar sesuai format, lalu tambahkan input user
+                chatHistory = [
+                    ...chatHistory.map(entry => ({
+                        role: entry.role,
+                        parts: entry.parts.map(p => (typeof p === "string" ? { text: p } : p))
+                    })),
+                    { role: "user", parts: [{ text: body }] }
+                ];
+
+                const chat = model.startChat({ history: chatHistory })
+
+                try {
+                    const message = await c.reply("Generating response...");
+                    const send = await chat.sendMessage(body);
+                    const response = send.response.text();
+
+                    // Simpan respons ke dalam history
+                    chatHistory.push({ role: "model", parts: [{ text: response }] });
+                    await saveSession(userId, chatHistory);
+
+                    // Kirim jawaban dan hapus pesan "Generating response..." secara paralel
+                    await Promise.all([
+                        c.reply(response, { parse_mode: "Markdown" }),
+                        c.api.deleteMessage(c.chatId!, message.message_id)
+                    ]);
+                } catch (err) {
+                    console.error(err);
+                    return c.reply(`Oops! An error occurred: ${(err as Error).message}`);
+                }
+
             }
         }
     }
