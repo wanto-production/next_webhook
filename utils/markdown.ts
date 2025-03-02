@@ -4,12 +4,23 @@ function escapeMarkdownV2(text: string): string {
 
 // Fungsi untuk mengonversi teks Markdown ke format MarkdownV2
 export function convertMarkdownToTelegramMarkdownV2(markdown: string): string {
-    // Konversi teks yang memiliki format Markdown biasa ke format MarkdownV2
     return markdown
-        .replace(/\*\*(.*?)\*\*/g, '*$1*')  // Bold
-        .replace(/__(.*?)__/g, '_$1_')      // Italic (menggunakan single underscore)
-        .replace(/\[(.*?)\]\((.*?)\)/g, '[$1]($2)')  // Link tetap sama
-        .replace(/`([^`]+)`/g, '`$1`')     // Inline code
-        .replace(/^#+\s*(.*)$/gm, '*$1*')  // Heading menjadi bold
-        .split('\n').map(escapeMarkdownV2).join('\n'); // Escape semua karakter spesial
+        .replace(/\*/g, '\\*')   // Escape bintang (*)
+        .replace(/_/g, '\\_')    // Escape underscore (_)
+        .replace(/\[/g, '\\[')   // Escape bracket kiri ([)
+        .replace(/\]/g, '\\]')   // Escape bracket kanan (])
+        .replace(/\(/g, '\\(')   // Escape kurung buka (()
+        .replace(/\)/g, '\\)')   // Escape kurung tutup ())
+        .replace(/~/g, '\\~')    // Escape tilde (~)
+        .replace(/`/g, '\\`')    // Escape backtick (`)
+        .replace(/>/g, '\\>')    // Escape tanda lebih besar (>)
+        .replace(/#/g, '\\#')    // Escape pagar (#)
+        .replace(/\+/g, '\\+')   // Escape plus (+)
+        .replace(/-/g, '\\-')    // Escape minus (-)
+        .replace(/=/g, '\\=')    // Escape sama dengan (=)
+        .replace(/\|/g, '\\|')   // Escape pipe (|)
+        .replace(/{/g, '\\{')    // Escape kurung kurawal buka ({)
+        .replace(/}/g, '\\}')    // Escape kurung kurawal tutup (})
+        .replace(/\./g, '\\.')   // Escape titik (.)
+        .replace(/!/g, '\\!');   // Escape tanda seru (!)l
 }
