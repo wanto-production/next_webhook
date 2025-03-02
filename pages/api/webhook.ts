@@ -19,7 +19,6 @@ bot.command('gemini', GeminiController.main)
 bot.command('reset', ResetController.main)
 bot.on("callback_query", ResetController.callback)
 
-bot.on("message", GeminiController.reply)
 bot.on("message", MessageController.main)
 
 bot.catch((error) => {
