@@ -96,7 +96,7 @@ export class GeminiController {
                     console.log(htmlRes)
                     // Kirim jawaban dan hapus pesan "Generating response..." secara paralel
                     await Promise.all([
-                        c.reply(turndownServ.turndown(htmlRes), { parse_mode: "HTML" }),
+                        c.reply(turndownServ.turndown(htmlRes), { parse_mode: "MarkdownV2" }),
                         c.api.deleteMessage(c.chatId!, message.message_id)
                     ]);
                 } catch (err) {
