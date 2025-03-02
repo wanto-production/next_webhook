@@ -45,7 +45,10 @@ export class GeminiController {
 
     static async reply(c: Context) {
         if (c.message?.reply_to_message) {
-            console.log(c)
+            const messageReply = c.message.reply_to_message
+            if (messageReply.from?.id === c.me.id) {
+                c.reply(`you chat ${c.message?.text}`)
+            }
         }
     }
 }
