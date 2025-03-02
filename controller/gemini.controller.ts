@@ -34,7 +34,7 @@ export class GeminiController {
 
             // Kirim jawaban dan hapus pesan "Generating response..." secara paralel
             await Promise.all([
-                ctx.reply(response, { parse_mode: "Markdown" }),
+                ctx.reply(response, { parse_mode: "HTML" }),
                 ctx.api.deleteMessage(ctx.chatId!, message.message_id)
             ]);
         } catch (err) {
@@ -75,7 +75,7 @@ export class GeminiController {
                     console.log(response)
                     // Kirim jawaban dan hapus pesan "Generating response..." secara paralel
                     await Promise.all([
-                        c.reply(response, { parse_mode: "Markdown" }),
+                        c.reply(response, { parse_mode: "HTML" }),
                         c.api.deleteMessage(c.chatId!, message.message_id)
                     ]);
                 } catch (err) {
